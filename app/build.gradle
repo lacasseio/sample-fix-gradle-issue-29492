@@ -1,0 +1,6 @@
+plugins {
+    id 'cpp-application'
+    id 'cpp-unit-test'
+
+    id 'com.example.fix-native-compile-inputs-when-moving-files'
+}

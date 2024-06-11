@@ -1,0 +1,35 @@
+import org.gradle.api.internal.file.TaskFileVarFactory;
+
+import javax.inject.Inject;
+
+@CacheableTask
+abstract class MyTask extends DefaultTask {
+    private final ConfigurableFileCollection source;
+
+    @Inject
+    MyTask(TaskFileVarFactory taskFileVarFactory, ObjectFactory objects) {
+//        this.source = taskFileVarFactory.newInputFileCollection(this);
+        this.source = objects.fileCollection()
+    }
+
+    @InputFiles
+    @SkipWhenEmpty
+    @IgnoreEmptyDirectories
+    @PathSensitive(PathSensitivity.RELATIVE)
+    ConfigurableFileCollection getInFiles() {
+        return source;
+    }
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutDir()
+
+    @TaskAction
+    void doAction() {
+        outDir.get().file('bob.txt').asFile.text = 'hello'
+    }
+}
+
+tasks.register('verify', MyTask) {
+    inFiles.from(fileTree('app/src/main/cpp') { include '**/*.cpp' })
+    outDir = layout.buildDirectory.dir('test')
+}
